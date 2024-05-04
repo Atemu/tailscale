@@ -1145,7 +1145,10 @@ var ipRules = []netlink.Rule{
 	// it takes precedence over all the others, ie. VPN routes always
 	// beat non-VPN routes.
 	{
-		Priority: 70,
+		// HACK: Actually place it after main and default in order to
+		// allow local routes to go through directly attached interfaces
+		// rather than a forwarded route via the VPN tunnel.
+		Priority: 32768,
 		Table:    tailscaleRouteTable.Num,
 	},
 	// If that didn't match, then non-fwmark packets fall through to the
