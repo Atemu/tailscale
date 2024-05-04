@@ -725,10 +725,19 @@ func (r *linuxRouter) addRoute(cidr netip.Prefix) error {
 	if err != nil {
 		return err
 	}
+	var routeTable int
+	if cidr.Bits() == 32 {
+		// A single address, put it into the TS table
+		routeTable = r.routeTable()
+	} else {
+		// A forwarded route, put into the main table
+		routeTable = mainRouteTable.Num
+	}
 	return netlink.RouteReplace(&netlink.Route{
 		LinkIndex: linkIndex,
 		Dst:       netipx.PrefixIPNet(cidr.Masked()),
-		Table:     r.routeTable(),
+		Table:     routeTable,
+		Priority:  1000, // Something higher than NM WiFi (600)
 	})
 }
 
