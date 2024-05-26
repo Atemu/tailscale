@@ -24,6 +24,7 @@ import (
 	"tailscale.com/envknob"
 	"tailscale.com/health"
 	"tailscale.com/net/netmon"
+	"tailscale.com/net/tsaddr"
 	"tailscale.com/types/logger"
 	"tailscale.com/types/preftype"
 	"tailscale.com/util/linuxfw"
@@ -726,7 +727,7 @@ func (r *linuxRouter) addRoute(cidr netip.Prefix) error {
 		return err
 	}
 	var routeTable int
-	if cidr.Bits() == 32 {
+	if tsaddr.IsTailscaleIP(cidr.Addr()) {
 		// A single address, put it into the TS table
 		routeTable = r.routeTable()
 	} else {
